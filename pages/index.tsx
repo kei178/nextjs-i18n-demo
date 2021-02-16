@@ -1,4 +1,4 @@
-import { NextPage, NextPageContext } from 'next';
+import { NextPage } from 'next';
 
 import { withTranslation } from '../i18n';
 import { TFunction } from 'next-i18next';
@@ -10,7 +10,8 @@ interface HomeProps {
 const Home: NextPage<HomeProps> = ({ t }) => {
   return (
     <div>
-      <p>{t('hello')}</p>
+      <h2>{t('hello')}</h2>
+      <p>{t('nested.greeting')}</p>
     </div>
   );
 };

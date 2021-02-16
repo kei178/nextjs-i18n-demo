@@ -1,3 +1,6 @@
 {
-  "hello": "Hello from English!"
+  "hello": "Hello from English!",
+  "nested": {
+    "greeting": "How are you?"
+  }
 }
