@@ -1,6 +1,6 @@
 {
   "hello": "Hallo aus deutsch!",
   "nested": {
-    "greeting": "Wie geht's?"
+    "greeting": "Wie geht's, {{name}}?"
   }
 }

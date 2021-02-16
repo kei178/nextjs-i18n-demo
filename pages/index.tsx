@@ -11,7 +11,7 @@ const Home: NextPage<HomeProps> = ({ t }) => {
   return (
     <div>
       <h2>{t('hello')}</h2>
-      <p>{t('nested.greeting')}</p>
+      <p>{t('nested.greeting', { name: 'Kei' })}</p>
     </div>
   );
 };
