@@ -118,7 +118,7 @@ const Home: NextPage<HomeProps> = ({ t }) => {
   return (
     <div>
       <h2>{t('hello')}</h2>
-      <p>{t('nested.greeting')}</p>
+      <p>{t('nested.greeting', { name: 'Kei' })}</p>
     </div>
   );
 };
@@ -127,3 +127,4 @@ export default withTranslation('common')(Home);
 ```
 * Use HOC `withTranslation`
 * Render translation contents by `t()`
+* `t()` takes an Object of dynamic traslation values as the second argument
