@@ -1,34 +1,129 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a demo [Next.js](https://nextjs.org/) app with [next-i18next](https://github.com/isaachinman/next-i18next). 
 
-## Getting Started
+## Setup
 
-First, run the development server:
+### 0. Before start
 
-```bash
-npm run dev
-# or
-yarn dev
+Create a Next.js app, and optionally install typesript.
+
+### 1. Installation
+
+```
+yarn add next-i18next
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Translation content
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+Add json files in `public/static/locales/[locale]` folders.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+```
+.
+└── public
+    └── static
+        └── locales
+            ├── en
+            |   └── common.json
+            └── de
+                └── common.json
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+### 3. Project setup
 
-## Learn More
+#### `i18n.js`
 
-To learn more about Next.js, take a look at the following resources:
+```jsx
+const NextI18Next = require('next-i18next').default;
+const { localeSubpaths } = require('next/config').default().publicRuntimeConfig;
+const path = require('path');
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+module.exports = new NextI18Next({
+  otherLanguages: ['de'],
+  localeSubpaths,
+  localePath: path.resolve('./public/static/locales'),
+});
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+```
 
-## Deploy on Vercel
+#### `next.config.js`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```jsx
+const { nextI18NextRewrites } = require('next-i18next/rewrites');
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+const localeSubpaths = {};
+
+module.exports = {
+  rewrites: async () => nextI18NextRewrites(localeSubpaths),
+  publicRuntimeConfig: {
+    localeSubpaths,
+  },
+};
+```
+
+#### `_app.tsx`
+
+```jsx
+import type { AppProps } from 'next/app';
+import { useEffect, useState } from 'react';
+
+import { appWithTranslation, useTranslation } from '../i18n';
+
+const MyApp = ({ Component, pageProps }: AppProps) => {
+  const { i18n } = useTranslation();
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
+
+  useEffect(() => {
+    i18n.changeLanguage(currentLanguage);
+  }, [currentLanguage]);
+
+  return (
+    <>
+      <button
+        onClick={() => {
+          setCurrentLanguage('en');
+        }}
+      >
+        EN
+      </button>{' '}
+      <button
+        onClick={() => {
+          setCurrentLanguage('de');
+        }}
+      >
+        DE
+      </button>
+      <Component {...pageProps} />
+    </>
+  );
+};
+
+export default appWithTranslation(MyApp);
+```
+
+* Use HOC `appWithTranslation`
+* Update the current language by `i18n.changeLanguage(currentLanguage)`
+
+#### `index.tsx`
+
+```jsx
+import { NextPage } from 'next';
+
+import { withTranslation } from '../i18n';
+import { TFunction } from 'next-i18next';
+
+interface HomeProps {
+  readonly t: TFunction;
+}
+
+const Home: NextPage<HomeProps> = ({ t }) => {
+  return (
+    <div>
+      <h2>{t('hello')}</h2>
+      <p>{t('nested.greeting')}</p>
+    </div>
+  );
+};
+
+export default withTranslation('common')(Home);
+```
+* Use HOC `withTranslation`
+* Render translation contents by `t()`
